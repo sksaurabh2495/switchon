@@ -6,6 +6,14 @@ app.get('/', function(request, response){
     response.send('This is the HomePage');
 });
 
+app.get('/switchon', function(request, response){
+    response.send('This is the switchon');
+});
+
+app.get('/switchon/', function(request, response){
+    response.send('This is the switchon/');
+});
+
 app.get('/contact', function(request, response){
     response.send('This is the Contact Page');
 });
