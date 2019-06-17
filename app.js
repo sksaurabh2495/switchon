@@ -1,18 +1,16 @@
-var http = require('http');
-var fs = require('fs');
+var express = require('express');
 
+var app = express();
 
-var server = http.createServer(function(request,response){
-    console.log('Request was made : ' + request.url);
-    response.writeHead(200, {'Content-Type' : 'application/json'});
-    var myObj = {
-        name : 'Ryu',
-        job : 'Ninja',
-        age : 24
-    };
-    response.end(JSON.stringify(myObj));
+app.get('/', function(request, response){
+    response.send('This is the HomePage');
 });
 
-server.listen(3000, '3.16.161.74');
+app.get('/contact', function(request, response){
+    response.send('This is the Contact Page');
+});
 
-console.log('Yo dawgs, you are listening to port 3000');
+const port = process.env.PORT || 5000;
+app.listen(port);
+
+console.log(`Yo dawgs, you are listening to port ${port}`);

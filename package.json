@@ -1,0 +1,22 @@
+{
+  "name": "switchon",
+  "version": "1.0.0",
+  "description": "Assignment for SwitchOn",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://sksaurabh24@bitbucket.org/sksaurabh24/switchon.git"
+  },
+  "keywords": [
+    "Assignment"
+  ],
+  "author": "Saurabh Kumar",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/sksaurabh24/switchon#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
