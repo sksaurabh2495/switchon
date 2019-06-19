@@ -1,0 +1,26 @@
+.nav-bar{
+	padding: 24px;
+	background: #000;
+}
+.nav-bar .nav-bg{
+	display: flex;
+	font-size: 22px;
+	color: #FFF;
+	margin: 0px;
+}
+.nav-bar .nav-bg li{
+	list-style: none;
+	padding: 0px 24px;
+}
+.nav-bar .nav-bg li a{
+	color: #FFF;
+}
+.ml-auto{
+	margin-left: auto;
+}
+.jc-center{
+	justify-content: center;
+}
+.signup{
+	margin-top: 3em;
+}

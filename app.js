@@ -1,24 +1,18 @@
-var express = require('express');
+const express = require('express');
+const database = require('./controllers/database');
 
-var app = express();
+const app = express();
 
-app.get('/', function(request, response){
-    response.send('This is the HomePage');
-});
+app.set('view engine', 'ejs');		//Setting view engine
 
-app.get('/switchon', function(request, response){
-    response.send('This is the switchon');
-});
+app.use('/assets', express.static('static'));		//middleware
 
-app.get('/switchon/', function(request, response){
-    response.send('This is the switchon/');
-});
+//fire controller
+database(app);
 
-app.get('/contact', function(request, response){
-    response.send('This is the Contact Page');
-});
 
-const port = process.env.PORT || 80;
+
+const port = process.env.PORT || 5000;
 app.listen(port);
 
 console.log(`Yo dawgs, you are listening to port ${port}`);
