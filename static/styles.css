@@ -21,6 +21,6 @@
 .jc-center{
 	justify-content: center;
 }
-.signup{
-	margin-top: 3em;
+.signup, .login{
+	margin-top: 3em !important;
 }

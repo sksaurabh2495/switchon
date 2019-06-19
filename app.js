@@ -1,11 +1,20 @@
 const express = require('express');
 const database = require('./controllers/database');
+const session = require('express-session');
+
 
 const app = express();
 
 app.set('view engine', 'ejs');		//Setting view engine
 
 app.use('/assets', express.static('static'));		//middleware
+
+//use sessions for tracking logins
+app.use(session({
+  secret: 'switchon assignment',
+  resave: true,
+  saveUninitialized: false
+}));
 
 //fire controller
 database(app);

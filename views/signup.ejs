@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
         <link rel="icon" type="image/png" sizes="16x16" href="/assets/imgs/favicon-16x16.png">
-        <title>SwitchOn Login</title>
+        <title>SwitchOn SignUp</title>
         <link href="/assets/styles.css" rel="stylesheet" type="text/css" />
         <link href="/assets/semantic/dist/semantic.min.css" rel="stylesheet" type="text/css" />
         <script src="/assets/jquery/jquery.min.js"></script>
@@ -19,7 +19,7 @@
       <div class="stackable">
         <div class="ui grid container">
           <div class="twelve wide mobile six wide computer centered column">
-             <form class="ui form segment signup" onsubmit="signin();" method="POST">
+             <form class="ui form segment signup" action="/switchon/signup" method="POST">
                 <p>Tell Us About Yourself</p>
                 <div class="two fields">
                   <div class="field">
@@ -30,12 +30,17 @@
                      <label>Department</label>
                      <select class="ui dropdown" name="department">
                        <option value="">Department</option>
-                       <option value="male">Male</option>
-                       <option value="female">Female</option>
+                       <% departments.forEach(function(item){     %>
+                            <option value="<%= item.id %>"><%= item.name %></option>
+                        <%    });   %>
                    </select>
                </div>
            </div>
            <div class="two fields">
+            <div class="field">
+               <label>Email</label>
+               <input type="email" name="email">
+           </div>
            <div class="field">
                <label>Password</label>
                <input type="password" name="password">
@@ -53,9 +58,6 @@
 </div>
 </div>
 </div>
-
-
-
 
 </body>
 </html>

@@ -21,6 +21,15 @@ $(function(){
         }
         ]
       },
+      email: {
+        identifier: 'email',
+        rules: [
+        {
+          type   : 'empty',
+          prompt : 'Please enter you email'
+        }
+        ]
+      },
       password: {
         identifier: 'password',
         rules: [
@@ -43,30 +52,52 @@ $(function(){
   })
 ;
 
+  $('.ui.form.login')
+  .form({
+    fields: {
+      email: {
+        identifier: 'email',
+        rules: [
+        {
+          type   : 'empty',
+          prompt : 'Please enter you email'
+        }
+        ]
+      },
+      password: {
+        identifier: 'password',
+        rules: [
+        {
+          type   : 'empty',
+          prompt : 'Please enter a password'
+        }
+        ]
+      }
+    }
+  })
+;
+
 });
 
 
-function signin()
-{
+// function signin()
+// {
 
-    $.ajax({
-        method: 'POST',
-        url : '/switchon/signin',
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        dataType: 'json',
-        data : {
-            'filterTopics' : "topic 1",
-            'searchQuery' : "query 2"
-        }
-    }).then(function (json){
-        if(json.code == 555){
-         
-            
-        }
-    },function (json){
-        //console.log(json);
-    });
+//     $.ajax({
+//         method: 'POST',
+//         url : '/switchon/signup',
+//         headers: {
+//             "Content-Type": "application/x-www-form-urlencoded"
+//         },
+//         dataType: 'json',
+//         data : {
+//             'filterTopics' : "topic 1",
+//             'searchQuery' : "query 2"
+//         }
+//     }).then(function (json){
+//         alert(json);
+//     },function (json){
+//         //console.log(json);
+//     });
 
-}
+// }

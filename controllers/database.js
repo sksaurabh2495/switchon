@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const parser = require('body-parser');
+const hash = require('password-hash');
 
 mongoose.set('useFindAndModify', false);
 const mongoUrl = 'mongodb://admin:admin@cluster0-shard-00-00-ryrmi.mongodb.net:27017,cluster0-shard-00-01-ryrmi.mongodb.net:27017,cluster0-shard-00-02-ryrmi.mongodb.net:27017/switchon?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority';
@@ -19,30 +20,27 @@ const conn = mongoose.connection;
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
+    name: String,
+    email: String,
+    departmentId: Number,
+    departmentName: String,
+    password: String
+});
+
+const deptschema = new Schema({
+    id: Number,
     name: String
 });
 
 const userModel = mongoose.model('users', schema);
+const deptModel = mongoose.model('departments', deptschema);
 var instance = new userModel();
 
-instance.name = 'Saurabh Kumar';
-instance.save(function (err) {
-    if (err) throw err;
-    console.log('Item saved.');
-});
-
-userModel.find({}, function (err, docs) {
-    console.log(docs);
-});
 
 var data = [{item: 'get milk'},{item: 'walk dog'},{item: 'kick some coding ass'}];
 var urlencodedParser = parser.urlencoded({extended: false});
 
 module.exports = function(app){
-
-    // app.get('/todo', function(request, response){
-    //     response.render('todo', {todos: data});
-    // });
 
     // app.post('/todo', urlencodedParser, function(request, response){
     //     data.push(request.body);
@@ -53,42 +51,87 @@ module.exports = function(app){
         response.send('This is the HomePage');
     });
 
+    app.get('/switchon', isLoggedIn, function (request, response){
+        response.render('home', {email: request.session._switchon_email});
+    });
 
     app.get('/switchon/login', isLoggedIn, function (request, response){
         response.render('home');
     });
 
+    app.post('/switchon/login', urlencodedParser, function (request, response){
+
+        userModel.find({email: request.body.email}, function (err, docs) {
+            //if (err) throw err;
+            if(docs.length == 0){
+                response.render('login', {message: 'User is not Registered'});   //user does not exist
+            }
+            else{
+                for(var i = 0 ; i < docs.length ; i++){
+                    if(hash.verify(request.body.password, docs[i].password)){
+                        //password matches
+                        request.session._switchon_email = docs[i].email;
+                        request.session._switchon_name = docs[i].name;
+                        request.session._switchon_departmentId = docs[i].departmentId;
+                        request.session._switchon_departmentName = docs[i].departmentName;
+                        response.redirect('/switchon');
+                        break;
+                    }
+                    if(i == docs.length - 1){
+                        response.render('login', {message: 'Incorrect Password'});   //incorrect password
+                    }
+                }
+            }
+        });
+    });
+
     app.get('/switchon/signup', function (request, response){
-        response.render('signup');
+        deptModel.find({}, function (err, docs) {
+            if(request.session){
+                request.session.destroy();
+            }
+            response.render('signup', {departments: docs});
+        });
     });
 
-    app.get('/switchon', isLoggedIn, function (request, response){
-        response.render('home');
-    });
+    app.post('/switchon/signup', urlencodedParser, function (request, response){
+        
+        instance.name = request.body.name;
+        instance.email = request.body.email;
+        instance.departmentId = request.body.department;
+        instance.password = hash.generate(request.body.password);
 
-    app.get('/switchon/contact', function (request, response){
-        var data = {age: 23, job: 'Developer', hobbies: ['Eating', 'Sleeping', 'Fishing']};
-        response.render('contact');
-        //response.render('contact', {person: request.params.name , data: data});
-    });
+        deptModel.find({id: instance.departmentId}, function (err, docs) {
+            
+            instance.departmentName = docs[0].name;
+            instance.save(function (err) {
+                //if (err) throw err;
+                if (err) response.redirect('/switchon/signup');
+                request.session._switchon_email = instance.email;
+                request.session._switchon_name = instance.name;
+                request.session._switchon_departmentId = instance.departmentId;
+                request.session._switchon_departmentName = instance.departmentName;
+            });
+            response.redirect('/switchon');
 
-    app.post('/switchon/signin', urlencodedParser, function (request, response){
-        console.log(request.body);
-        response.render('home');
+        });
+        
     });
 
     app.get('/switchon/logout', function (request, response) {
         if(request.session){
-            request.session.username = null;
-            request.session.userid = null;
-            request.session.department = null;
-            request.session.departmentid = null;
+            request.session.destroy(function(err) {
+                if(err) {
+                    return next(err);
+                } else {
+                    response.redirect('/switchon/login');
+                }
+            });
         }
-        response.render('login');
     });
 
     function isLoggedIn (request, response, next) {
-        if (!(request.session && request.session.username && request.session.userid && request.session.department && request.session.departmentid)) {
+        if (!(request.session && request.session._switchon_email && request.session._switchon_name)) {
             response.render('login');
         }
         else{
@@ -97,3 +140,4 @@ module.exports = function(app){
     }
 
 };
+
