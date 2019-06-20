@@ -249,5 +249,33 @@ module.exports = function(app){
         
     });
 
+    app.get('/switchon/accept', isLoggedIn, function (request, response){
+
+        var resdata = {code: -111};
+        requestModel.findOneAndUpdate({id: request.query.id}, {$set:{status: 0 }} , function (err, docs) {
+                if(!err){
+                    resdata.code = 555;
+                    resdata.id = request.query.id;
+                }
+                response.end(JSON.stringify(resdata));
+                io.emit('approved request', docs);
+        });
+
+    });
+
+    app.get('/switchon/reject', isLoggedIn, function (request, response){
+
+        var resdata = {code: -111};
+        requestModel.findOneAndUpdate({id: request.query.id}, {$set:{status: -1 }} , function (err, docs) {
+                if(!err){
+                    resdata.code = 555;
+                    resdata.id = request.query.id;
+                }
+                response.end(JSON.stringify(resdata));
+                io.emit('rejected request', docs);
+        });
+
+    });
+
 };
 
