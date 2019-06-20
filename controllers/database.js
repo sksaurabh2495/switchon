@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const parser = require('body-parser');
 const hash = require('password-hash');
 
+
 mongoose.set('useFindAndModify', false);
 const mongoUrl = 'mongodb://admin:admin@cluster0-shard-00-00-ryrmi.mongodb.net:27017,cluster0-shard-00-01-ryrmi.mongodb.net:27017,cluster0-shard-00-02-ryrmi.mongodb.net:27017/switchon?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority';
 const opts = { useNewUrlParser: true};
@@ -38,21 +39,28 @@ const countschema = new Schema({
     counter: Number
 });
 
+const requestschema = new Schema({
+    id: Number,
+    status: Number,             //  -1: rejected, 0: accepted, 1: pending
+    fromUid: Number,
+    toUid: Number,
+    fromDept: Number,
+    toDept: Number,
+    message: String,
+    fromUser: String,
+    toUser: String,
+    fromDeptName: String,
+    toDeptName: String
+});
+
 const userModel = mongoose.model('users', schema);
 const deptModel = mongoose.model('departments', deptschema);
 const counterModel = mongoose.model('counters', countschema);
-var instance = new userModel();
+const requestModel = mongoose.model('requests', requestschema);
 
-
-var data = [{item: 'get milk'},{item: 'walk dog'},{item: 'kick some coding ass'}];
 var urlencodedParser = parser.urlencoded({extended: false});
 
 module.exports = function(app){
-
-    // app.post('/todo', urlencodedParser, function(request, response){
-    //     data.push(request.body);
-    //     response.json(data);
-    // });
 
     app.get('/', function (request, response){
         response.send('This is the HomePage');
@@ -107,6 +115,7 @@ module.exports = function(app){
 
     app.post('/switchon/signup', urlencodedParser, function (request, response){
         
+        var instance = new userModel();
         instance.name = request.body.name;
         instance.email = request.body.email;
         instance.departmentId = request.body.department;
@@ -158,6 +167,87 @@ module.exports = function(app){
             next();
         }
     }
+
+    app.get('/switchon/dept', function (request, response){
+        var data = {code: -111};
+        deptModel.find({}, function (err, docs) {
+            if(!err){
+                data.code = 555;
+                data.data = docs;
+            }
+            response.end(JSON.stringify(data));
+        });
+    });
+
+    app.get('/switchon/user', function (request, response){
+        var data = {code: -111};
+        userModel.find({departmentId: request.query.id}, function (err, docs) {
+            if(!err){
+                data.code = 555;
+                data.data = docs;
+            }
+            response.end(JSON.stringify(data));
+        });
+    });
+
+    app.post('/switchon/request', urlencodedParser, function (request, response){
+        var data = {code: -111};
+        counterModel.findOneAndUpdate({name: 'requests'}, {$inc:{counter:1}}, function (err, docscount) {
+
+            var req_instance = new requestModel();
+            req_instance.id = docscount.counter;
+            req_instance.fromUid = request.body.my_uid;
+            req_instance.toUid = request.body.uid;
+            req_instance.fromDept = request.body.my_did;
+            req_instance.toDept = request.body.did;
+            req_instance.message = request.body.message;
+            req_instance.status = 1;
+
+            req_instance.fromUser = request.session._switchon_name + ' (' + request.session._switchon_email + ')';
+            req_instance.toUser = request.body.uname;
+            req_instance.fromDeptName = request.session._switchon_departmentName;
+            req_instance.toDeptName = request.body.dname;
+
+            req_instance.save(function (err) {
+                if(!err){
+                    data.code = 555;
+                }
+                response.end(JSON.stringify(data));
+                io.emit('new request', req_instance);
+            });
+        });
+    });
+
+    app.get('/switchon/service/:type', isLoggedIn, function (request, response){
+        
+        var data = [];
+        var opts = { toDept: request.session._switchon_departmentId };
+        switch(request.params.type){
+            case 'pending':
+                opts.status = 1;
+            break;
+            case 'approved':
+                opts.status = 0;
+            break;
+            case 'rejected':
+                opts.status = -1;
+            break;
+            case 'confirm':
+                opts.status = 1;
+                opts.toUid = request.session._switchon_id;
+            break;
+        }
+        requestModel.find(opts).sort({id: -1}).exec(function (err, docs) {
+            if(!err){
+                data = docs;
+            }
+            data.pageUri = request.params.type;
+            data.userData = request.session;
+            response.render('service', {requestData: data});
+            
+        });
+        
+    });
 
 };
 

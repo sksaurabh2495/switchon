@@ -13,18 +13,39 @@
     </head>
     <body>
         <% include partials/nav.ejs %>
-        <div class="stackable mainContainer">
-            <div class="ui grid container mContent">
-                <div class="twelve wide mobile six wide computer column lBox">
-                    <%= userData._switchon_email %>
+        <div class="stackable">
+            <div class="ui grid container">
+                <div class="twelve wide mobile six wide computer centered column">
+                    <form class="ui form segment request-from" action="javascript:void(0);">
+                        <p>Create New Request</p>
+                        <div class="two fields">
+                          <div class="field">
+                           <label>Department</label>
+                           <select class="ui dropdown select-department" name="department" onchange="load_user();">
+                             <option value="">Select Department</option>
+                         </select>
+                     </div>
+                       <div class="field">
+                           <label>User</label>
+                           <select class="ui dropdown select-user" name="user">
+                             <option value="">Select User</option>
+                         </select>
+                     </div>
+                 </div>
+                    <div class="field">
+                     <label>Message (optional)</label>
+                     <input id="message" type="text" name="message" value="" />
+                 </div>
+         <button class="ui primary button create-btn" onclick="create_request();">Create Request</button>
+         <div class="ui error message"></div>
+     </form>
                 </div>
             </div>
         </div>
-
-
+        <div id="userData" uid="<%= userData._switchon_id %>" did="<%= userData._switchon_departmentId %>" ></div>
 
         <script src="/assets/jquery/jquery.min.js"></script>
-        <script src="/assets/common.js"></script>
+        <script src="/assets/home.js"></script>
         <script src="/assets/semantic/dist/semantic.js"></script>
     </body>
 </html>

@@ -20,8 +20,19 @@ app.use(session({
 database(app);
 
 
-
 const port = process.env.PORT || 5000;
-app.listen(port);
+const server = app.listen(port);
+
+//real time notification
+global.io = require('socket.io').listen(server);
+
+io.on('connection', (socket) =>{
+
+	console.log('A user is connected and opened service.ejs');
+	// socket.on('chat message', function(msg){
+ //    	console.log('message: ' + msg);
+ //  	});
+
+});
 
 console.log(`Yo dawgs, you are listening to port ${port}`);

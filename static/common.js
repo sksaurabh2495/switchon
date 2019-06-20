@@ -78,26 +78,3 @@ $(function(){
 ;
 
 });
-
-
-// function signin()
-// {
-
-//     $.ajax({
-//         method: 'POST',
-//         url : '/switchon/signup',
-//         headers: {
-//             "Content-Type": "application/x-www-form-urlencoded"
-//         },
-//         dataType: 'json',
-//         data : {
-//             'filterTopics' : "topic 1",
-//             'searchQuery' : "query 2"
-//         }
-//     }).then(function (json){
-//         alert(json);
-//     },function (json){
-//         //console.log(json);
-//     });
-
-// }

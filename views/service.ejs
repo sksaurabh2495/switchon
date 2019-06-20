@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/imgs/favicon-16x16.png">
+        <title>SwitchOn Assignment</title>
+        <link href="/assets/styles.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/semantic/dist/semantic.min.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <% include partials/nav.ejs %>
+        <div class="stackable">
+            <div class="ui grid container">
+                <div class="twelve wide mobile eight wide computer centered column">
+
+                    <div id="messages" class="messages">
+                        <% for(var i = 0; i < requestData.length; i++){ %>
+                        <div id="request-<%=  requestData[i].id  %>" class="message-box"><span class="msg-name1"><%=  requestData[i].fromUser  %></span> from <span class="dept-name1"><%=  requestData[i].fromDeptName  %></span> requested to <span class="msg-name2"><%=  requestData[i].toUser  %></span> from <span class="dept-name2"><%=  requestData[i].toDeptName  %></span>
+                        <div class="msg-text"><%=  requestData[i].message  %></div>
+                        <%
+                        if(requestData.pageUri == 'confirm'){
+                        %>
+                        <button class="ui positive button action-btn" onclick="accept_request();">Accept</button>
+                        <button class="ui negative button action-btn" onclick="reject_request();">Reject</button>
+                        <%
+                            }
+                        %>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="userData" pageuri="<%= requestData.pageUri %>" uid="<%= requestData.userData._switchon_id %>" did="<%= requestData.userData._switchon_departmentId %>" ></div>
+        <script src="/assets/jquery/jquery.min.js"></script>
+        <script src="/assets/service.js"></script>
+        <script src="/assets/semantic/dist/semantic.js"></script>
+        <script src="/assets/socket.io/socket.io.js"></script>
+    </body>
+</html>

@@ -21,6 +21,32 @@
 .jc-center{
 	justify-content: center;
 }
-.signup, .login{
+.signup, .login, .request-from, .messages{
 	margin-top: 3em !important;
+}
+
+.message-box{
+	margin-bottom: 10px;
+    font-size: 16px;
+    background: ghostwhite;
+    padding: 30px;
+    border: 1px;
+    border-style: solid;
+    border-color: gainsboro;
+    border-radius: 4px;
+    color: dimgray;
+}
+.msg-name1, .msg-name2{
+	color: cornflowerblue;
+}
+.dept-name1, .dept-name2{
+	color: navy;
+}
+.msg-text{
+	color: #333333;
+	margin-top: 8px;
+    font-size: 14px;
+}
+.action-btn{
+	margin-top: 22px !important;
 }
