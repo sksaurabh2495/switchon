@@ -20,6 +20,7 @@ const conn = mongoose.connection;
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
+    id: Number,
     name: String,
     email: String,
     departmentId: Number,
@@ -32,8 +33,14 @@ const deptschema = new Schema({
     name: String
 });
 
+const countschema = new Schema({
+    name: String,
+    counter: Number
+});
+
 const userModel = mongoose.model('users', schema);
 const deptModel = mongoose.model('departments', deptschema);
+const counterModel = mongoose.model('counters', countschema);
 var instance = new userModel();
 
 
@@ -52,11 +59,11 @@ module.exports = function(app){
     });
 
     app.get('/switchon', isLoggedIn, function (request, response){
-        response.render('home', {email: request.session._switchon_email});
+        response.render('home', {userData: request.session});
     });
 
     app.get('/switchon/login', isLoggedIn, function (request, response){
-        response.render('home');
+        response.render('home', {userData: request.session});
     });
 
     app.post('/switchon/login', urlencodedParser, function (request, response){
@@ -70,11 +77,15 @@ module.exports = function(app){
                 for(var i = 0 ; i < docs.length ; i++){
                     if(hash.verify(request.body.password, docs[i].password)){
                         //password matches
+                        request.session._switchon_id = docs[i].id;
                         request.session._switchon_email = docs[i].email;
                         request.session._switchon_name = docs[i].name;
                         request.session._switchon_departmentId = docs[i].departmentId;
                         request.session._switchon_departmentName = docs[i].departmentName;
-                        response.redirect('/switchon');
+
+                        request.session.save(function (err) {
+                            response.redirect('/switchon');
+                        });
                         break;
                     }
                     if(i == docs.length - 1){
@@ -104,15 +115,24 @@ module.exports = function(app){
         deptModel.find({id: instance.departmentId}, function (err, docs) {
             
             instance.departmentName = docs[0].name;
-            instance.save(function (err) {
-                //if (err) throw err;
-                if (err) response.redirect('/switchon/signup');
-                request.session._switchon_email = instance.email;
-                request.session._switchon_name = instance.name;
-                request.session._switchon_departmentId = instance.departmentId;
-                request.session._switchon_departmentName = instance.departmentName;
+            counterModel.findOneAndUpdate({name: 'users'}, {$inc:{counter:1}}, function (err, docscount) {
+                
+                instance.id = docscount.counter;
+                instance.save(function (err) {
+                    //if (err) throw err;
+                    if (err) response.redirect('/switchon/signup');
+                    request.session._switchon_id = instance.id;
+                    request.session._switchon_email = instance.email;
+                    request.session._switchon_name = instance.name;
+                    request.session._switchon_departmentId = instance.departmentId;
+                    request.session._switchon_departmentName = instance.departmentName;
+
+                    request.session.save(function (err) {
+                        response.redirect('/switchon');
+                    });
+                    
+                });
             });
-            response.redirect('/switchon');
 
         });
         
@@ -131,7 +151,7 @@ module.exports = function(app){
     });
 
     function isLoggedIn (request, response, next) {
-        if (!(request.session && request.session._switchon_email && request.session._switchon_name)) {
+        if (!(request.session && request.session._switchon_id && request.session._switchon_email && request.session._switchon_name)) {
             response.render('login');
         }
         else{
