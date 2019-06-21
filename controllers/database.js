@@ -63,7 +63,7 @@ var urlencodedParser = parser.urlencoded({extended: false});
 module.exports = function(app){
 
     app.get('/', function (request, response){
-        response.send('<a href="./switchon" style="padding: 45px !important;top: 5em;position: relative;margin: 8em !important;background: beige;">SwitchOn Assignment</a>');
+        response.send('<a href="./switchon" style="padding: 45px !important;top: 5em;position: relative;margin: 8em !important;background: beige;">SwitchOn Assignment (NodeJS)</a>');
     });
 
     app.get('/switchon', isLoggedIn, function (request, response){
